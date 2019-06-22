@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@stfy/react-editor.js": "^0.1.5",
-    "@todokek/react-editor.js": "^1.0.1",
+    "@todokek/react-editor.js": "^1.0.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
