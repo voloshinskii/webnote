@@ -38,9 +38,7 @@ class App extends Component {
   }
 
   componentDidUpdate(){
-    console.log(this.state);
     localStorage.setItem('document1', JSON.stringify(this.state.data));
-
   }
 
   render(){
