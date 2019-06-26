@@ -5,7 +5,13 @@
   "dependencies": {
     "@stfy/react-editor.js": "^0.1.5",
     "@todokek/react-editor.js": "^1.0.2",
+    "@voloshinskii/kekui": "^2.0.1",
+    "dnd-core": "^8.0.3",
+    "immutability-helper": "^3.0.1",
+    "lodash": "^4.17.11",
     "react": "^16.8.6",
+    "react-dnd": "^8.0.3",
+    "react-dnd-html5-backend": "^8.0.3",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
   },

@@ -1,0 +1,43 @@
+.cdx-map {
+  border-radius: 7px;
+	background: #edf0f5;
+	margin: 15px 0;
+}
+
+.cdx-map-input{
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: white;
+  border: 1.4px solid rgba(34,36,38,0.15);
+  padding: 8px 18px;
+  transition: 0.3s;
+	margin-bottom: 15px;
+	min-width: 200px;
+}
+
+.cdx-map [contentEditable=true][data-placeholder]::before{
+  position: absolute;
+  content: attr(data-placeholder);
+  color: #707684;
+  font-weight: normal;
+  opacity: 0;
+}
+
+.cdx-map [contentEditable=true][data-placeholder]:empty::before {
+  opacity: 1;
+}
+
+.cdx-map [contentEditable=true][data-placeholder]:empty:focus::before {
+  opacity: 0;
+}
+
+.cdx-map-input::placeholder{
+	color: grey
+}
+
+.cdx-map-input:focus{
+	outline: none;
+	border: 1.4px solid rgba(114, 137, 218, 0.75);
+	transition: 0.3s;
+}
