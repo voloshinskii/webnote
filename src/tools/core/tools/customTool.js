@@ -37,7 +37,7 @@ class BlockComponent extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState){
-		if(prevState !== this.state){
+		if(prevState.data !== this.state.data){
 			this.save();
 		}
 	}
