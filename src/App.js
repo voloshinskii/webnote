@@ -8,12 +8,19 @@ class App extends Component {
       this.state = {
         data: {}
       }
+      this.updateData = this.updateData.bind(this);
+  }
+
+  updateData(){
+
   }
 
   render(){
     return (
         <div style={{padding: '0 5%'}}>
-          <ReactEditor/>
+          <ReactEditor
+            onUpdate={this.updateData}
+          />
         </div>
     );
   }

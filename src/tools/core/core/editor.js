@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ToolSelect from '../tools/toolSelect';
 import Block from '../tools/block';
 import Header from '../tools/header';
 import keys from './keys';
@@ -16,12 +17,15 @@ class ReactEditor extends Component {
         data: [],
 				tools: {
 					'Block': {
-						tool: Block
+						tool: Block,
+            config: Block.provide
 					},
 					'Header': {
-						tool: Header
+						tool: Header,
+            config: Header.provide
 					}
-				}
+				},
+        toolSelect: ToolSelect,
       }
 			var tools = {};
 
@@ -34,42 +38,64 @@ class ReactEditor extends Component {
 			this.registerTool = this.registerTool.bind(this);
 			this.renderTool = this.renderTool.bind(this);
 			this.renderTools = this.renderTools.bind(this);
+      this.deleteTool = this.deleteTool.bind(this);
 			this.save = this.save.bind(this);
       this.move = this.move.bind(this);
       this.keyDown = this.keyDown.bind(this);
       this.keyUp = this.keyUp.bind(this);
       this.nextSelect = this.nextSelect.bind(this);
+      this.prevSelect = this.prevSelect.bind(this);
+      this.getIndexById = this.getIndexById.bind(this);
+      this.addTool = this.addTool.bind(this);
   }
 
 	componentWillMount(){
 		var tools = this.state.tools;
 		if(this.props.tools){
-			this.props.tools.forEach(tool => {
-				var r_tool = this.registerTool(tool);
+      var keys = Object.keys(this.props.tools);
+      var arr = Object.values(this.props.tools);
+			arr.forEach((tool, index) => {
+				var r_tool = this.registerTool(tool, keys[index]);
 				tools[r_tool.config.name] = r_tool;
-				this.setState({tools: tools});
 			});
 		}
+    this.setState({tools: tools});
+    if(this.state.data.length === 0) this.addTool('Block');
 	}
+
+  getIndexById(id){
+    var data = this.state.data;
+    return data.findIndex(item =>{
+      return item._id === this.state.focusedElement.id;
+    });
+  }
 
   initFocus(ref){
     ref.current.focus();
   }
 
-	registerTool(tool){
-		let data = {};
-		data.config = tool.config || tool.tool.provide;
+	registerTool(tool, name){
+    let data = {};
+    if(this.props.config && this.props.config[name]){
+      data.config = Object.assign(this.props.config[name], tool.tool.provide);
+    }
+    else data.config = tool.config;
 		data.tool = tool.tool;
 		return data;
 	}
 
-  toolFocus(id){
+  toolFocus(id, type){
     var data = this.state.data;
     var index = data.findIndex(item =>{
       return item._id === id;
     });
+    var item = {
+      id: id,
+      index: index
+    };
+    if(type) item.type = type;
     if(index !== -1){
-      this.setState({focusedElement: {id: id, index: index}})
+      this.setState({focusedElement: item})
     }
     else this.setState({focusedElement: undefined});
   }
@@ -95,20 +121,45 @@ class ReactEditor extends Component {
           save={ this.save }
           move={ this.move }
           index={ index }
+          addTool={ this.addTool }
           { ...tool.config }
           focused={ focused }
           initFocus={ this.initFocus }
+          selfDestroy={ this.deleteTool }
+          focusNext={this.nextSelect}
+          focusPrev={this.prevSelect}
+          focusedElement={this.state.focusedElement}
+          toolSelect={this.state.toolSelect}
+          tools={this.state.tools}
+          config={this.state.tools[tool.block].config}
         />
       </div>
     );
 	}
 
-  nextSelect(){
+  nextSelect(id, to){
     var data = this.state.data;
-    var focusedElement = this.state.focusedElement;
+    var focusedElement = {};
+    if(!id) focusedElement = this.state.focusedElement;
+    else{
+      focusedElement.index = this.getIndexById(id);
+    }
     if(!focusedElement) return;
     if(focusedElement.index >= data.length-1) return;
-    this.toolFocus(data[focusedElement.index+1]._id);
+    this.toolFocus(data[focusedElement.index+1]._id, 'next');
+    this.setState({data});
+  }
+
+  prevSelect(id){
+    var data = this.state.data;
+    var focusedElement = {};
+    if(!id) focusedElement = this.state.focusedElement;
+    else{
+      focusedElement.index = this.getIndexById(id);
+    }
+    if(!focusedElement) return;
+    if(focusedElement.index === 0) return;
+    this.toolFocus(data[focusedElement.index-1]._id, 'prev');
   }
 
 	renderTools(){
@@ -117,7 +168,7 @@ class ReactEditor extends Component {
 		});
 	}
 
-	addTool(name, index){
+	async addTool(name, index, mode){
 		var list = this.state.data;
 
 		var toolToPush = {
@@ -130,10 +181,21 @@ class ReactEditor extends Component {
 
     if(index === undefined || index === -1) list.push(toolToPush);
     else list.splice(index+1, 0, toolToPush);
-
-		this.setState({data: list});
+		await this.setState({data: list});
+    if( mode !== 'silent') this.toolFocus(toolToPush._id);
     return toolToPush._id;
 	}
+
+  deleteTool(id, type){
+    var data = this.state.data;
+    var index = data.findIndex(item =>{
+      return item._id === id;
+    });
+    data.splice(index, 1);
+    var elemBefore = data[index-1];
+    if(elemBefore) this.toolFocus(elemBefore._id, type);
+    this.setState({data: data});
+  }
 
 	save(data, id){
 		var curData = this.state.data;
@@ -145,6 +207,12 @@ class ReactEditor extends Component {
 
 	componentDidUpdate(){
 		console.log(this.state);
+    if(this.state.data.length === 0) this.addTool('Block');
+    var focusedElement = this.state.focusedElement;
+    if(focusedElement && focusedElement.type){
+      delete focusedElement.type;
+      this.setState({focusedElement: focusedElement});
+    }
 	}
 
   keyUp(e){
@@ -153,16 +221,15 @@ class ReactEditor extends Component {
 
   keyDown(e){
     this.keys[e.keyCode] = true;
-
     if(e.keyCode === keys['DELETE']) {
+      e.preventDefault();
       if(!this.state.focusedElement) return;
       var data = this.state.data;
       var index = data.findIndex(item =>{
         return item._id === this.state.focusedElement.id;
       });
       data.splice(index, 1);
-      var elemBefore = data[index-1];
-      if(elemBefore) this.toolFocus(elemBefore._id);
+      this.prevSelect();
       this.setState({data: data});
     }
 
@@ -209,8 +276,6 @@ class ReactEditor extends Component {
               )}
             </Droppable>
           </DragDropContext>
-          <button onClick={()=> this.addTool('Block')} >Add block</button>
-          <button onClick={()=> this.addTool('Header')} >Add header</button>
         </div>
     );
   }

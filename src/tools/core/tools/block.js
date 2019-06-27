@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import BlockComponent from './customTool';
+import keys from '../core/keys';
 
 class Block extends BlockComponent {
   constructor(props){
@@ -7,7 +8,8 @@ class Block extends BlockComponent {
       this.state = {
         data: {
           value: '',
-        }
+        },
+        prevPos: 15
       }
 			this.saveData = this.saveData.bind(this);
   }
@@ -19,6 +21,13 @@ class Block extends BlockComponent {
 		this.setState({data: {value: e.target.innerHTML }});
 	}
 
+  onBackspace(e){
+    if(this.state.data.value === ''){
+      e.preventDefault();
+      this.selfDestroy();
+    }
+  }
+
 	static get provide(){
     return {
 			name: 'Block',
@@ -29,8 +38,12 @@ class Block extends BlockComponent {
   }
 
   renderEditor(){
+    var ToolSelect = this.props.toolSelect;
     return (
-        <div ref={this.mainInput} onInput={this.saveData} style={{width: '100%', minHeight: 40}} contentEditable />
+        <div>
+          {!this.state.data.value &&<ToolSelect index={this.props.index} addTool={this.props.addTool} destroy={this.selfDestroy} config={this.props.tools}/>}
+          <div onKeyDown={this.keyDown} className="block_component" ref={this.mainInput} onInput={this.saveData} style={{width: '100%', minHeight: 25}} contentEditable />
+        </div>
     );
   }
 }

@@ -1,13 +1,12 @@
 import React, { useRef } from 'react'
 import { Draggable } from 'react-beautiful-dnd';
 
-const BlockDraggable = ({ Block, _id, index, move, save, focused, initFocus }) => {
+const BlockDraggable = ({ Block, _id, index, move, ...restProps }) => {
 
   var propsToSend = {
-    save: save,
-    _id: _id,
-    focused: focused,
-    initFocus: initFocus
+    index,
+    _id,
+    ...restProps
   };
   return (
     <Draggable draggableId={_id} index={index}>
