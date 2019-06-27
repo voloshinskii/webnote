@@ -12,7 +12,7 @@ class App extends Component {
 
   render(){
     return (
-        <div>
+        <div style={{padding: '0 5%'}}>
           <ReactEditor/>
         </div>
     );

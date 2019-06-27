@@ -5,7 +5,9 @@ class Block extends BlockComponent {
   constructor(props){
       super(props);
       this.state = {
-        data: { },
+        data: {
+          value: '',
+        }
       }
 			this.saveData = this.saveData.bind(this);
   }
@@ -14,7 +16,7 @@ class Block extends BlockComponent {
 		if (!e.target.textContent.trim().length) {
       e.target.innerHTML = '';
     }
-		this.setState({data: { value: e.target.innerHTML }});
+		this.setState({data: {value: e.target.innerHTML }});
 	}
 
 	static get provide(){
@@ -28,7 +30,7 @@ class Block extends BlockComponent {
 
   renderEditor(){
     return (
-        <div onInput={this.saveData} style={{width: 400, minHeight: 200}} contentEditable />
+        <div ref={this.mainInput} onInput={this.saveData} style={{width: '100%', minHeight: 40}} contentEditable />
     );
   }
 }
