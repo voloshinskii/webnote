@@ -8,7 +8,7 @@
     "@voloshinskii/kekui": "^2.0.1",
     "dnd-core": "^8.0.3",
     "immutability-helper": "^3.0.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.4",
     "react-dnd": "^8.0.3",
